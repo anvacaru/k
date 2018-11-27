@@ -11,6 +11,7 @@ import org.kframework.krun.RewriterModule;
 import org.kframework.main.FrontEnd;
 import org.kframework.main.GlobalOptions;
 import org.kframework.main.Tool;
+import org.kframework.utils.errorsystem.KEMException;
 import org.kframework.utils.inject.Options;
 import org.kframework.utils.options.DefinitionLoadingOptions;
 import org.kframework.utils.options.SMTOptions;
@@ -26,8 +27,14 @@ public class KProveModule extends AbstractModule {
 
         Multibinder<Object> optionsBinder = Multibinder.newSetBinder(binder(), Object.class, Options.class);
         optionsBinder.addBinding().to(KProveOptions.class);
-        Multibinder<Class<?>> experimentalOptionsBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<Class<?>>() {}, Options.class);
 
+        Multibinder<Class<?>> experimentalOptionsBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<Class<?>>() {}, Options.class);
+        experimentalOptionsBinder.addBinding().toInstance(SMTOptions.class);
+        try {
+            experimentalOptionsBinder.addBinding().toInstance(Class.forName("org.kframework.backend.java.symbolic.JavaExecutionOptions"));
+        } catch (ClassNotFoundException e) {
+            throw KEMException.criticalError("JavaExecutionOptions class not found" + e);
+        }
     }
 
     @Provides
