@@ -45,6 +45,11 @@ public class KRunModule extends AbstractModule {
         Multibinder<Class<?>> experimentalOptionsBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<Class<?>>() {}, Options.class);
         experimentalOptionsBinder.addBinding().toInstance(KRunOptions.Experimental.class);
         experimentalOptionsBinder.addBinding().toInstance(SMTOptions.class);
+        try {
+            experimentalOptionsBinder.addBinding().toInstance(Class.forName("org.kframework.backend.java.symbolic.JavaExecutionOptions"));
+        } catch (ClassNotFoundException e) {
+            throw KEMException.criticalError("JavaExecutionOptions class not found" + e);
+        }
 
         ThrowingProviderBinder throwingBinder = ThrowingProviderBinder.create(binder());
     }
